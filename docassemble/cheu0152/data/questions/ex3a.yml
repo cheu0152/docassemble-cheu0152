@@ -1,0 +1,107 @@
+---
+variable name: DCfam_info
+use objects: True
+data:
+   - First name: Karen
+     Last name: Boomer
+     Age: 65
+     Hobbies: Toilet Paper Shopping
+     Do you like pets?: False
+   - First name: Ronald
+     Last name: Boomer
+     Age: 69
+     Hobbies: Complaining about technology
+     Do you like pets?: True
+   - First name: Larry
+     Last name: Lanky
+     Age: 15
+     Hobbies: Being lazy and entitled
+     Do you like pets?: True
+   - First name: Robert
+     Last name: Wilson 
+     Age: 20
+     Hobbies: Reading Blackshield and Williams
+     Do you like pets?: False
+   - First name: Lauren
+     Last name: Kirby 
+     Age: 20 
+     Hobbies: Argueing with people online
+     Do you like pets?: True
+---
+code: |
+  DCcolumn_header = ""
+  
+  for DCitem in DCfam_info[0]:
+    DCcolumn_header += DCitem + '|'
+    
+  DCcolumn_header = DCcolumn_header[:-1]
+---
+#header
+code: |
+  DCdash = "---"
+  for i in range(len(DCfam_info[0])-1):
+    DCdash += "|---"
+---
+code: |
+  DCtable_rows = []
+  
+  for DCitem in DCfam_info:
+    MDrow= ""
+    for DCkey in DCitem:
+      MDrow += str(DCitem[DCkey])+'|'
+    
+    MDrow = MDrow[:-1]
+    
+    DCtable_rows.append(MDrow)
+---
+mandatory: True
+question: Family Information
+subquestion: |
+  ## information collected for family member is below:
+  ${ DCcolumn_header }
+  ${ DCdash }
+  %for DCitem in DCtable_rows:
+  ${ DCitem }
+  %endfor
+  
+  Confirm data on next page.
+buttons:
+  - Continue: continue
+  - Exit: exit
+  - Restart: restart
+---
+question:
+  ${ DCfam_info[i]['First name'] }, is the following data correct?
+subquestion: |
+fields:
+  Confirm correct info: DCfam_info[i]['DCanswers']
+  datatype: checkboxes
+  code: DCfam_info[i].values()
+---
+table: DCtable
+rows: DCfam_info
+columns:
+  - First name:
+      row_item['First name']
+  - Last name:
+      row_item['Last name']
+  - Age:
+      row_item['Age']
+  - Hobbies:
+      row_item['Hobbies']
+  - Likes pets:
+      row_item['Do you like pets?']
+  - information that is correct: |
+      row_item['DCanswers'].true_values()
+---
+mandatory: True
+question: Correct Information
+subquestion: |
+  ${ DCtable }
+attachment:
+  docx template file: jinjacode.docx
+  valid formats:
+    - pdf
+---
+  
+  
